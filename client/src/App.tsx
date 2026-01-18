@@ -10,6 +10,7 @@ import Products from "./pages/Products";
 import ProductDetail from "./pages/ProductDetail";
 import Checkout from "./pages/Checkout";
 import Success from "./pages/Success";
+import About from "./pages/About";
 
 
 function Router() {
@@ -18,6 +19,7 @@ function Router() {
       <Route path={"/"} component={Home} />
       <Route path={"/products"} component={Products} />
       <Route path={"/product/:id"} component={ProductDetail} />
+      <Route path={"/about"} component={About} />
       <Route path={"/checkout"} component={Checkout} />
       <Route path={"/success"} component={Success} />
       <Route path={"/404"} component={NotFound} />

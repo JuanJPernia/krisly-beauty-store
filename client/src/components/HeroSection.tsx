@@ -62,13 +62,15 @@ export default function HeroSection() {
                     <ArrowRight className="ml-2 group-hover:translate-x-1 transition-transform" size={20} />
                   </Button>
                 </a>
-                <Button
-                  size="lg"
-                  variant="outline"
-                  className="border-2 border-gray-300 text-gray-700 hover:bg-gray-50 rounded-full px-8"
-                >
-                  Conocer a Krisly
-                </Button>
+                <a href="/about" className="inline-block">
+                  <Button
+                    size="lg"
+                    variant="outline"
+                    className="border-2 border-gray-300 text-gray-700 hover:bg-gray-50 rounded-full px-8"
+                  >
+                    Conocer a Krisly
+                  </Button>
+                </a>
               </div>
             </div>
           </div>
