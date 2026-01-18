@@ -36,14 +36,18 @@ export default function ProductCard({
   const [isFavorite, setIsFavorite] = useState(false);
   const { addItem } = useCart();
 
-  const handleAddToCart = () => {
-    addItem({
-      id,
-      name,
-      price,
-      image,
-    });
-    toast.success(`${name} agregado al carrito`);
+  const handleAddToCart = async () => {
+    try {
+      await addItem({
+        product_id: parseInt(id),
+        name,
+        price,
+        image,
+      });
+      toast.success(`${name} agregado al carrito`);
+    } catch (error) {
+      toast.error('Error al agregar al carrito');
+    }
   };
 
   return (

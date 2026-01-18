@@ -2,10 +2,11 @@
  * Cart Context
  * 
  * Gestiona el estado global del carrito de compras
- * Proporciona funciones para agregar, remover y actualizar productos
+ * Ahora conectado con el backend FastAPI
  */
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { API_ENDPOINTS, apiGet, apiPost, apiPut, apiDelete, getUserId } from '@/lib/api';
 
 export interface CartItem {
   id: string;
@@ -13,60 +14,189 @@ export interface CartItem {
   price: number;
   quantity: number;
   image: string;
+  product_id?: number;
 }
 
 interface CartContextType {
   items: CartItem[];
-  addItem: (item: Omit<CartItem, 'quantity'>) => void;
-  removeItem: (id: string) => void;
-  updateQuantity: (id: string, quantity: number) => void;
-  clearCart: () => void;
+  addItem: (item: Omit<CartItem, 'quantity' | 'id'> & { product_id: number }) => Promise<void>;
+  removeItem: (id: string) => Promise<void>;
+  updateQuantity: (id: string, quantity: number) => Promise<void>;
+  clearCart: () => Promise<void>;
   totalItems: number;
   totalPrice: number;
+  loading: boolean;
+  error: string | null;
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
 export function CartProvider({ children }: { children: React.ReactNode }) {
-  const [items, setItems] = useState<CartItem[]>(() => {
-    // Load cart from localStorage on mount
-    const saved = localStorage.getItem('cart');
-    return saved ? JSON.parse(saved) : [];
-  });
+  const [items, setItems] = useState<CartItem[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const userId = getUserId();
 
-  // Save cart to localStorage whenever it changes
+  // Cargar carrito del backend al montar el componente
   useEffect(() => {
-    localStorage.setItem('cart', JSON.stringify(items));
-  }, [items]);
+    loadCartFromBackend();
+  }, []);
 
-  const addItem = (item: Omit<CartItem, 'quantity'>) => {
-    setItems((prevItems) => {
-      const existingItem = prevItems.find((i) => i.id === item.id);
-      if (existingItem) {
-        return prevItems.map((i) =>
-          i.id === item.id ? { ...i, quantity: i.quantity + 1 } : i
-        );
-      }
-      return [...prevItems, { ...item, quantity: 1 }];
-    });
-  };
-
-  const removeItem = (id: string) => {
-    setItems((prevItems) => prevItems.filter((i) => i.id !== id));
-  };
-
-  const updateQuantity = (id: string, quantity: number) => {
-    if (quantity <= 0) {
-      removeItem(id);
-      return;
+  const loadCartFromBackend = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      
+      const response = await apiGet<any>(API_ENDPOINTS.CART(userId));
+      
+      // Transformar datos del backend al formato del frontend
+      const transformedItems = response.items.map((item: any) => ({
+        id: item.id.toString(),
+        name: item.product.name,
+        price: item.product.price,
+        quantity: item.quantity,
+        image: item.product.image,
+        product_id: item.product_id,
+      }));
+      
+      setItems(transformedItems);
+    } catch (err) {
+      console.error('Error loading cart:', err);
+      setError('Error al cargar el carrito');
+      // Si hay error, cargar desde localStorage como fallback
+      loadCartFromLocalStorage();
+    } finally {
+      setLoading(false);
     }
-    setItems((prevItems) =>
-      prevItems.map((i) => (i.id === id ? { ...i, quantity } : i))
-    );
   };
 
-  const clearCart = () => {
-    setItems([]);
+  const loadCartFromLocalStorage = () => {
+    try {
+      const saved = localStorage.getItem('cart');
+      if (saved) {
+        setItems(JSON.parse(saved));
+      }
+    } catch (err) {
+      console.error('Error loading cart from localStorage:', err);
+    }
+  };
+
+  const addItem = async (item: Omit<CartItem, 'quantity' | 'id'> & { product_id: number }) => {
+    try {
+      setLoading(true);
+      setError(null);
+      
+      const response = await apiPost<any>(
+        API_ENDPOINTS.CART_ADD_ITEM(userId),
+        {
+          product_id: item.product_id,
+          quantity: 1,
+        }
+      );
+      
+      // Actualizar estado local
+      const transformedItems = response.items.map((i: any) => ({
+        id: i.id.toString(),
+        name: i.product.name,
+        price: i.product.price,
+        quantity: i.quantity,
+        image: i.product.image,
+        product_id: i.product_id,
+      }));
+      
+      setItems(transformedItems);
+      localStorage.setItem('cart', JSON.stringify(transformedItems));
+    } catch (err) {
+      console.error('Error adding item to cart:', err);
+      setError('Error al agregar producto al carrito');
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const removeItem = async (id: string) => {
+    try {
+      setLoading(true);
+      setError(null);
+      
+      const response = await apiDelete<any>(
+        API_ENDPOINTS.CART_REMOVE_ITEM(userId, parseInt(id))
+      );
+      
+      // Actualizar estado local
+      const transformedItems = response.items.map((i: any) => ({
+        id: i.id.toString(),
+        name: i.product.name,
+        price: i.product.price,
+        quantity: i.quantity,
+        image: i.product.image,
+        product_id: i.product_id,
+      }));
+      
+      setItems(transformedItems);
+      localStorage.setItem('cart', JSON.stringify(transformedItems));
+    } catch (err) {
+      console.error('Error removing item from cart:', err);
+      setError('Error al eliminar producto del carrito');
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const updateQuantity = async (id: string, quantity: number) => {
+    try {
+      setLoading(true);
+      setError(null);
+      
+      if (quantity <= 0) {
+        await removeItem(id);
+        return;
+      }
+      
+      const response = await apiPut<any>(
+        API_ENDPOINTS.CART_UPDATE_ITEM(userId, parseInt(id)),
+        { quantity }
+      );
+      
+      // Actualizar estado local
+      const transformedItems = response.items.map((i: any) => ({
+        id: i.id.toString(),
+        name: i.product.name,
+        price: i.product.price,
+        quantity: i.quantity,
+        image: i.product.image,
+        product_id: i.product_id,
+      }));
+      
+      setItems(transformedItems);
+      localStorage.setItem('cart', JSON.stringify(transformedItems));
+    } catch (err) {
+      console.error('Error updating quantity:', err);
+      setError('Error al actualizar cantidad');
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const clearCart = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      
+      await apiDelete(API_ENDPOINTS.CART_CLEAR(userId));
+      
+      setItems([]);
+      localStorage.removeItem('cart');
+    } catch (err) {
+      console.error('Error clearing cart:', err);
+      setError('Error al vaciar el carrito');
+      throw err;
+    } finally {
+      setLoading(false);
+    }
   };
 
   const totalItems = items.reduce((sum, item) => sum + item.quantity, 0);
@@ -82,6 +212,8 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         clearCart,
         totalItems,
         totalPrice,
+        loading,
+        error,
       }}
     >
       {children}
