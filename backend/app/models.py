@@ -80,3 +80,28 @@ class OrderItem(Base):
     # Relaciones
     order = relationship("Order", back_populates="items")
     product = relationship("Product", back_populates="order_items")
+
+class Review(Base):
+    """Modelo para reseñas de productos"""
+    __tablename__ = "reviews"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    product_id = Column(Integer, ForeignKey("products.id"))
+    user_id = Column(String, index=True)  # ID del usuario/cliente
+    rating = Column(Integer)  # Calificación 1-5
+    comment = Column(String)  # Comentario del cliente
+    created_at = Column(DateTime, default=datetime.utcnow)
+    
+    # Relaciones
+    product = relationship("Product")
+
+class ContactMessage(Base):
+    """Modelo para mensajes de contacto"""
+    __tablename__ = "contact_messages"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    name = Column(String)
+    email = Column(String)
+    subject = Column(String)
+    message = Column(String)
+    created_at = Column(DateTime, default=datetime.utcnow)

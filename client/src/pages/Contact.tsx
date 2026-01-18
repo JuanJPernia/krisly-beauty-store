@@ -2,7 +2,7 @@
  * Contact Page
  * 
  * Página de contacto con formulario para que los clientes se comuniquen
- * Diseño elegante en tonos pasteles
+ * Integrada con backend para guardar mensajes en base de datos
  */
 
 import { useState } from 'react';
@@ -48,9 +48,18 @@ export default function Contact() {
     setLoading(true);
 
     try {
-      // Simular envío del formulario
-      // En producción, esto se enviaría a un backend
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      // Enviar mensaje al backend
+      const response = await fetch('/api/contact', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      });
+
+      if (!response.ok) {
+        throw new Error('Error al enviar el mensaje');
+      }
 
       toast.success('¡Mensaje enviado exitosamente! Te contactaremos pronto.');
       
@@ -62,6 +71,7 @@ export default function Contact() {
         message: '',
       });
     } catch (error) {
+      console.error('Error:', error);
       toast.error('Error al enviar el mensaje. Intenta nuevamente.');
     } finally {
       setLoading(false);

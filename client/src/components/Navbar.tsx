@@ -22,6 +22,7 @@ export default function Navbar() {
   const navItems = [
     { label: 'Inicio', href: '/' },
     { label: 'Productos', href: '/products' },
+    { label: 'Mis Órdenes', href: '/orders' },
     { label: 'Sobre Krisly', href: '/about' },
     { label: 'Contacto', href: '/contact' },
   ];

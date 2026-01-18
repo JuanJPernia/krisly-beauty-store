@@ -12,6 +12,7 @@ import Checkout from "./pages/Checkout";
 import Success from "./pages/Success";
 import About from "./pages/About";
 import Contact from "./pages/Contact";
+import Orders from "./pages/Orders";
 
 
 function Router() {
@@ -24,6 +25,7 @@ function Router() {
       <Route path={"/contact"} component={Contact} />
       <Route path={"/checkout"} component={Checkout} />
       <Route path={"/success"} component={Success} />
+      <Route path={"/orders"} component={Orders} />
       <Route path={"/404"} component={NotFound} />
       {/* Final fallback route */}
       <Route component={NotFound} />

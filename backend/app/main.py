@@ -6,7 +6,7 @@ Punto de entrada de la aplicación backend
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from .database import Base, engine
-from .routes import products, cart
+from .routes import products, cart, reviews, contact
 
 # Crear las tablas en la base de datos
 Base.metadata.create_all(bind=engine)
@@ -32,6 +32,8 @@ app.add_middleware(
 # Incluir rutas
 app.include_router(products.router)
 app.include_router(cart.router)
+app.include_router(reviews.router)
+app.include_router(contact.router)
 
 @app.get("/")
 def read_root():

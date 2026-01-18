@@ -91,3 +91,40 @@ class Message(BaseModel):
 class ErrorResponse(BaseModel):
     error: str
     detail: Optional[str] = None
+
+# ============ RESEÑAS ============
+
+class ReviewCreate(BaseModel):
+    product_id: int
+    rating: int  # 1-5
+    comment: str
+
+class ReviewResponse(BaseModel):
+    id: int
+    product_id: int
+    user_id: str
+    rating: int
+    comment: str
+    created_at: datetime
+    
+    class Config:
+        from_attributes = True
+
+# ============ CONTACTO ============
+
+class ContactMessageCreate(BaseModel):
+    name: str
+    email: str
+    subject: str
+    message: str
+
+class ContactMessageResponse(BaseModel):
+    id: int
+    name: str
+    email: str
+    subject: str
+    message: str
+    created_at: datetime
+    
+    class Config:
+        from_attributes = True
