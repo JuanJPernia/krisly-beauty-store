@@ -9,6 +9,8 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Mail, Phone, MapPin, Send } from 'lucide-react';
 import { toast } from 'sonner';
+import Navbar from '@/components/Navbar';
+import Footer from '@/components/Footer';
 
 export default function Contact() {
   const [formData, setFormData] = useState({
@@ -67,7 +69,8 @@ export default function Contact() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-pink-50 via-white to-pink-50">
+    <div className="min-h-screen flex flex-col bg-gradient-to-b from-pink-50 via-white to-pink-50">
+      <Navbar />
       {/* Header */}
       <div className="pt-20 pb-12 text-center">
         <h1 className="text-5xl font-bold text-slate-900 mb-4 font-display">
@@ -260,6 +263,7 @@ export default function Contact() {
           </div>
         </div>
       </div>
+      <Footer />
     </div>
   );
 }

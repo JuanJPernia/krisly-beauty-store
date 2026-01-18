@@ -13,14 +13,33 @@ import { Search, Filter } from 'lucide-react';
 import Navbar from '@/components/Navbar';
 import ProductCard from '@/components/ProductCard';
 import Footer from '@/components/Footer';
-import { products, Product } from '@/lib/products';
+import { getProducts } from '@/lib/productApi';
+import type { Product } from '@/lib/productApi';
 
 export default function Products() {
+  const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [sortBy, setSortBy] = useState('featured');
 
   const categories = ['Maquillaje', 'Cuidado Personal', 'Herramientas'];
+
+  // Cargar productos del backend
+  useEffect(() => {
+    const loadProducts = async () => {
+      setLoading(true);
+      try {
+        const data = await getProducts();
+        setProducts(data);
+      } catch (error) {
+        console.error('Error loading products:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    loadProducts();
+  }, []);
 
   // Leer parámetro de categoría de la URL al cargar
   useEffect(() => {
@@ -53,7 +72,19 @@ export default function Products() {
   } else if (sortBy === 'price-high') {
     filteredProducts = [...filteredProducts].sort((a, b) => b.price - a.price);
   } else if (sortBy === 'rating') {
-    filteredProducts = [...filteredProducts].sort((a, b) => b.rating - a.rating);
+    filteredProducts = [...filteredProducts].sort((a, b) => (b.rating || 0) - (a.rating || 0));
+  }
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-white">
+        <Navbar />
+        <div className="container mx-auto px-4 py-12 text-center">
+          <p className="text-gray-600">Cargando productos...</p>
+        </div>
+        <Footer />
+      </div>
+    );
   }
 
   return (
