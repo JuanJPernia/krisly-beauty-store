@@ -6,68 +6,29 @@
  * - Espacios amplios entre elementos
  * - Tipografía elegante con jerarquía clara
  * - Transiciones suaves en scroll
+ * - Carga dinámica desde base de datos
  */
 
+import { useEffect, useState } from 'react';
 import ProductCard from './ProductCard';
-
-const featuredProducts = [
-  {
-    id: '1',
-    name: 'Paleta de Sombras Premium Rose Gold',
-    category: 'Maquillaje',
-    price: 45.99,
-    image: '/images/featured-products.jpg',
-    rating: 4.9,
-    reviews: 156,
-  },
-  {
-    id: '2',
-    name: 'Sérum Facial Hidratante Luxury',
-    category: 'Cuidado Personal',
-    price: 52.00,
-    image: '/images/skincare-collection.jpg',
-    rating: 4.8,
-    reviews: 89,
-  },
-  {
-    id: '3',
-    name: 'Set de Brochas de Maquillaje Premium',
-    category: 'Herramientas',
-    price: 68.50,
-    image: '/images/makeup-brushes.jpg',
-    rating: 4.7,
-    reviews: 124,
-  },
-  {
-    id: '4',
-    name: 'Labial Mate Larga Duración',
-    category: 'Maquillaje',
-    price: 28.99,
-    image: '/images/featured-products.jpg',
-    rating: 4.9,
-    reviews: 203,
-  },
-  {
-    id: '5',
-    name: 'Crema Facial Antienvejecimiento',
-    category: 'Cuidado Personal',
-    price: 65.00,
-    image: '/images/skincare-collection.jpg',
-    rating: 4.8,
-    reviews: 142,
-  },
-  {
-    id: '6',
-    name: 'Base de Maquillaje Full Coverage',
-    category: 'Maquillaje',
-    price: 38.50,
-    image: '/images/featured-products.jpg',
-    rating: 4.7,
-    reviews: 178,
-  },
-];
+import { getProducts, Product } from '@/lib/productApi';
 
 export default function FeaturedProducts() {
+  const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const loadProducts = async () => {
+      setLoading(true);
+      const allProducts = await getProducts();
+      // Mostrar solo los primeros 6 productos como destacados
+      setProducts(allProducts.slice(0, 6));
+      setLoading(false);
+    };
+
+    loadProducts();
+  }, []);
+
   const handleViewAll = () => {
     window.location.href = '/products';
   };
@@ -88,18 +49,34 @@ export default function FeaturedProducts() {
           </p>
         </div>
 
+        {/* Loading State */}
+        {loading && (
+          <div className="flex justify-center items-center py-20">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-pink-400"></div>
+          </div>
+        )}
+
         {/* Products Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {featuredProducts.map((product, index) => (
-            <div
-              key={product.id}
-              className="animate-in fade-in slide-in-from-bottom duration-700"
-              style={{ animationDelay: `${index * 100}ms` }}
-            >
-              <ProductCard {...product} />
-            </div>
-          ))}
-        </div>
+        {!loading && products.length > 0 && (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {products.map((product, index) => (
+              <div
+                key={product.id}
+                className="animate-in fade-in slide-in-from-bottom duration-700"
+                style={{ animationDelay: `${index * 100}ms` }}
+              >
+                <ProductCard {...product} />
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* Empty State */}
+        {!loading && products.length === 0 && (
+          <div className="text-center py-20">
+            <p className="text-gray-500 text-lg">No hay productos disponibles en este momento.</p>
+          </div>
+        )}
 
         {/* View All Button */}
         <div className="flex justify-center mt-16">
