@@ -6,7 +6,7 @@
 // URL base del backend
 // En desarrollo: http://localhost:8000
 // En producción: tu dominio
-const API_BASE_URL = process.env.VITE_API_URL || 'http://localhost:8000';
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
 
 export const API_ENDPOINTS = {
   // Productos
@@ -99,6 +99,10 @@ export async function apiDelete<T>(url: string): Promise<T> {
  * Generar o obtener un ID único para el usuario
  */
 export function getUserId(): string {
+  if (typeof window === 'undefined') {
+    return 'server-user';
+  }
+  
   let userId = localStorage.getItem('userId');
   
   if (!userId) {
