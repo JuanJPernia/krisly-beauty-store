@@ -53,13 +53,15 @@ export default function HeroSection() {
 
               {/* CTA Buttons */}
               <div className="flex flex-col sm:flex-row gap-4 pt-4">
-                <Button
-                  size="lg"
-                  className="bg-pink-400 hover:bg-pink-500 text-white rounded-full px-8 transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5 group"
-                >
-                  Explorar Colección
-                  <ArrowRight className="ml-2 group-hover:translate-x-1 transition-transform" size={20} />
-                </Button>
+                <a href="/products" className="inline-block">
+                  <Button
+                    size="lg"
+                    className="bg-pink-400 hover:bg-pink-500 text-white rounded-full px-8 transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5 group"
+                  >
+                    Explorar Colección
+                    <ArrowRight className="ml-2 group-hover:translate-x-1 transition-transform" size={20} />
+                  </Button>
+                </a>
                 <Button
                   size="lg"
                   variant="outline"
