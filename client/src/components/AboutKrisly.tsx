@@ -70,9 +70,11 @@ export default function AboutKrisly() {
 
             {/* CTA */}
             <div className="pt-4">
-              <button className="px-8 py-4 bg-gradient-to-r from-pink-400 to-pink-500 hover:from-pink-500 hover:to-pink-600 text-white rounded-full font-semibold transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5">
-                Descubre su Historia Completa
-              </button>
+              <a href="/about" className="inline-block">
+                <button className="px-8 py-4 bg-gradient-to-r from-pink-400 to-pink-500 hover:from-pink-500 hover:to-pink-600 text-white rounded-full font-semibold transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5">
+                  Descubre su Historia Completa
+                </button>
+              </a>
             </div>
           </div>
         </div>
