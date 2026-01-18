@@ -4,9 +4,9 @@
  */
 
 // URL base del backend
-// En desarrollo: http://localhost:8000
+// En desarrollo: usa ngrok para exponer el backend local
 // En producción: tu dominio
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://nondistorting-intradermal-andria.ngrok-free.dev';
 
 export const API_ENDPOINTS = {
   // Productos
@@ -22,14 +22,21 @@ export const API_ENDPOINTS = {
 };
 
 /**
+ * Headers comunes para todas las peticiones
+ */
+const commonHeaders = {
+  'Content-Type': 'application/json',
+  'ngrok-skip-browser-warning': '69420',
+  'User-Agent': 'Mozilla/5.0',
+};
+
+/**
  * Función para hacer peticiones GET
  */
 export async function apiGet<T>(url: string): Promise<T> {
   const response = await fetch(url, {
     method: 'GET',
-    headers: {
-      'Content-Type': 'application/json',
-    },
+    headers: commonHeaders,
   });
 
   if (!response.ok) {
@@ -45,9 +52,7 @@ export async function apiGet<T>(url: string): Promise<T> {
 export async function apiPost<T>(url: string, data: any): Promise<T> {
   const response = await fetch(url, {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
+    headers: commonHeaders,
     body: JSON.stringify(data),
   });
 
@@ -64,9 +69,7 @@ export async function apiPost<T>(url: string, data: any): Promise<T> {
 export async function apiPut<T>(url: string, data: any): Promise<T> {
   const response = await fetch(url, {
     method: 'PUT',
-    headers: {
-      'Content-Type': 'application/json',
-    },
+    headers: commonHeaders,
     body: JSON.stringify(data),
   });
 
@@ -83,9 +86,7 @@ export async function apiPut<T>(url: string, data: any): Promise<T> {
 export async function apiDelete<T>(url: string): Promise<T> {
   const response = await fetch(url, {
     method: 'DELETE',
-    headers: {
-      'Content-Type': 'application/json',
-    },
+    headers: commonHeaders,
   });
 
   if (!response.ok) {

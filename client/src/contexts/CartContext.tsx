@@ -2,7 +2,7 @@
  * Cart Context
  * 
  * Gestiona el estado global del carrito de compras
- * Ahora conectado con el backend FastAPI
+ * Con fallback a localStorage si el backend no está disponible
  */
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
@@ -27,6 +27,7 @@ interface CartContextType {
   totalPrice: number;
   loading: boolean;
   error: string | null;
+  backendAvailable: boolean;
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
@@ -35,6 +36,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   const [items, setItems] = useState<CartItem[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [backendAvailable, setBackendAvailable] = useState(false);
   const userId = getUserId();
 
   // Cargar carrito del backend al montar el componente
@@ -60,9 +62,11 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       }));
       
       setItems(transformedItems);
+      setBackendAvailable(true);
+      localStorage.setItem('cart', JSON.stringify(transformedItems));
     } catch (err) {
-      console.error('Error loading cart:', err);
-      setError('Error al cargar el carrito');
+      console.error('Error loading cart from backend:', err);
+      setBackendAvailable(false);
       // Si hay error, cargar desde localStorage como fallback
       loadCartFromLocalStorage();
     } finally {
@@ -86,23 +90,56 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       setLoading(true);
       setError(null);
       
-      const response = await apiPost<any>(
-        API_ENDPOINTS.CART_ADD_ITEM(userId),
-        {
-          product_id: item.product_id,
-          quantity: 1,
+      let transformedItems: CartItem[];
+
+      if (backendAvailable) {
+        try {
+          const response = await apiPost<any>(
+            API_ENDPOINTS.CART_ADD_ITEM(userId),
+            {
+              product_id: item.product_id,
+              quantity: 1,
+            }
+          );
+          
+          transformedItems = response.items.map((i: any) => ({
+            id: i.id.toString(),
+            name: i.product.name,
+            price: i.product.price,
+            quantity: i.quantity,
+            image: i.product.image,
+            product_id: i.product_id,
+          }));
+        } catch (backendErr) {
+          console.warn('Backend failed, using localStorage:', backendErr);
+          setBackendAvailable(false);
+          // Fallback a localStorage
+          transformedItems = [...items];
+          const existingItem = transformedItems.find(i => i.product_id === item.product_id);
+          if (existingItem) {
+            existingItem.quantity += 1;
+          } else {
+            transformedItems.push({
+              id: `local_${Date.now()}`,
+              ...item,
+              quantity: 1,
+            });
+          }
         }
-      );
-      
-      // Actualizar estado local
-      const transformedItems = response.items.map((i: any) => ({
-        id: i.id.toString(),
-        name: i.product.name,
-        price: i.product.price,
-        quantity: i.quantity,
-        image: i.product.image,
-        product_id: i.product_id,
-      }));
+      } else {
+        // Usar localStorage directamente
+        transformedItems = [...items];
+        const existingItem = transformedItems.find(i => i.product_id === item.product_id);
+        if (existingItem) {
+          existingItem.quantity += 1;
+        } else {
+          transformedItems.push({
+            id: `local_${Date.now()}`,
+            ...item,
+            quantity: 1,
+          });
+        }
+      }
       
       setItems(transformedItems);
       localStorage.setItem('cart', JSON.stringify(transformedItems));
@@ -120,19 +157,30 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       setLoading(true);
       setError(null);
       
-      const response = await apiDelete<any>(
-        API_ENDPOINTS.CART_REMOVE_ITEM(userId, parseInt(id))
-      );
-      
-      // Actualizar estado local
-      const transformedItems = response.items.map((i: any) => ({
-        id: i.id.toString(),
-        name: i.product.name,
-        price: i.product.price,
-        quantity: i.quantity,
-        image: i.product.image,
-        product_id: i.product_id,
-      }));
+      let transformedItems: CartItem[];
+
+      if (backendAvailable) {
+        try {
+          const response = await apiDelete<any>(
+            API_ENDPOINTS.CART_REMOVE_ITEM(userId, parseInt(id))
+          );
+          
+          transformedItems = response.items.map((i: any) => ({
+            id: i.id.toString(),
+            name: i.product.name,
+            price: i.product.price,
+            quantity: i.quantity,
+            image: i.product.image,
+            product_id: i.product_id,
+          }));
+        } catch (backendErr) {
+          console.warn('Backend failed, using localStorage:', backendErr);
+          setBackendAvailable(false);
+          transformedItems = items.filter(item => item.id !== id);
+        }
+      } else {
+        transformedItems = items.filter(item => item.id !== id);
+      }
       
       setItems(transformedItems);
       localStorage.setItem('cart', JSON.stringify(transformedItems));
@@ -155,20 +203,35 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         return;
       }
       
-      const response = await apiPut<any>(
-        API_ENDPOINTS.CART_UPDATE_ITEM(userId, parseInt(id)),
-        { quantity }
-      );
-      
-      // Actualizar estado local
-      const transformedItems = response.items.map((i: any) => ({
-        id: i.id.toString(),
-        name: i.product.name,
-        price: i.product.price,
-        quantity: i.quantity,
-        image: i.product.image,
-        product_id: i.product_id,
-      }));
+      let transformedItems: CartItem[];
+
+      if (backendAvailable) {
+        try {
+          const response = await apiPut<any>(
+            API_ENDPOINTS.CART_UPDATE_ITEM(userId, parseInt(id)),
+            { quantity }
+          );
+          
+          transformedItems = response.items.map((i: any) => ({
+            id: i.id.toString(),
+            name: i.product.name,
+            price: i.product.price,
+            quantity: i.quantity,
+            image: i.product.image,
+            product_id: i.product_id,
+          }));
+        } catch (backendErr) {
+          console.warn('Backend failed, using localStorage:', backendErr);
+          setBackendAvailable(false);
+          transformedItems = items.map(item =>
+            item.id === id ? { ...item, quantity } : item
+          );
+        }
+      } else {
+        transformedItems = items.map(item =>
+          item.id === id ? { ...item, quantity } : item
+        );
+      }
       
       setItems(transformedItems);
       localStorage.setItem('cart', JSON.stringify(transformedItems));
@@ -186,7 +249,14 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       setLoading(true);
       setError(null);
       
-      await apiDelete(API_ENDPOINTS.CART_CLEAR(userId));
+      if (backendAvailable) {
+        try {
+          await apiDelete(API_ENDPOINTS.CART_CLEAR(userId));
+        } catch (backendErr) {
+          console.warn('Backend failed, using localStorage:', backendErr);
+          setBackendAvailable(false);
+        }
+      }
       
       setItems([]);
       localStorage.removeItem('cart');
@@ -214,6 +284,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         totalPrice,
         loading,
         error,
+        backendAvailable,
       }}
     >
       {children}
