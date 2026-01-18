@@ -90,18 +90,29 @@ export default function Checkout() {
         }),
       });
 
+      // Verificar si la respuesta es válida
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('Server error response:', errorText);
+        toast.error('Error del servidor. Por favor, intenta de nuevo.');
+        setIsLoading(false);
+        return;
+      }
+
       const data = await response.json();
 
       if (data.checkoutUrl) {
         clearCart();
         window.open(data.checkoutUrl, '_blank');
         toast.success('Redirigiendo a Stripe para completar el pago...');
+      } else if (data.error) {
+        toast.error(data.error);
       } else {
-        toast.error(data.error || 'Error al crear la sesión de pago');
+        toast.error('Error al crear la sesión de pago');
       }
     } catch (error) {
       console.error('Checkout error:', error);
-      toast.error('Error al procesar el pago');
+      toast.error('Error al procesar el pago. Por favor, intenta de nuevo.');
     } finally {
       setIsLoading(false);
     }
