@@ -16,6 +16,9 @@ class ProductBase(BaseModel):
     category: str
     image: str
     stock: int
+    rating: float = 4.5
+    sales_count: int = 0
+    is_featured: bool = False
 
 class ProductCreate(ProductBase):
     pass

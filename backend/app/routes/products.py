@@ -71,6 +71,35 @@ def update_product(
     db.refresh(db_product)
     return db_product
 
+@router.get("/featured/by-criteria", response_model=list[ProductSchema])
+def get_featured_products(
+    criteria: str = "featured",  # featured, rating, sales
+    limit: int = 6,
+    db: Session = Depends(get_db)
+):
+    """
+    Obtener productos destacados según criterio
+    Criterios disponibles:
+    - featured: Productos marcados como destacados (is_featured=True)
+    - rating: Productos con mejor calificación
+    - sales: Productos más vendidos
+    """
+    query = db.query(Product)
+    
+    if criteria == "featured":
+        # Productos marcados como destacados
+        products = query.filter(Product.is_featured == True).limit(limit).all()
+    elif criteria == "rating":
+        # Productos ordenados por calificación (mayor a menor)
+        products = query.order_by(Product.rating.desc()).limit(limit).all()
+    elif criteria == "sales":
+        # Productos ordenados por número de ventas (mayor a menor)
+        products = query.order_by(Product.sales_count.desc()).limit(limit).all()
+    else:
+        raise HTTPException(status_code=400, detail="Criterio inválido. Use: featured, rating, o sales")
+    
+    return products
+
 @router.delete("/{product_id}")
 def delete_product(product_id: int, db: Session = Depends(get_db)):
     """Eliminar un producto (solo admin)"""

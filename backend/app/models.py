@@ -19,6 +19,9 @@ class Product(Base):
     category = Column(String)
     image = Column(String)
     stock = Column(Integer, default=0)
+    rating = Column(Float, default=4.5)  # Calificación del producto (0-5)
+    sales_count = Column(Integer, default=0)  # Número de ventas
+    is_featured = Column(Boolean, default=False)  # Marcado como destacado
     created_at = Column(DateTime, default=datetime.utcnow)
     
     # Relaciones

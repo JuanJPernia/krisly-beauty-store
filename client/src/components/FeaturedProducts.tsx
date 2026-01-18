@@ -7,30 +7,46 @@
  * - Tipografía elegante con jerarquía clara
  * - Transiciones suaves en scroll
  * - Carga dinámica desde base de datos
+ * - Selector de criterio para mostrar productos destacados
  */
 
 import { useEffect, useState } from 'react';
 import ProductCard from './ProductCard';
-import { getProducts, Product } from '@/lib/productApi';
+import { getFeaturedProducts, Product } from '@/lib/productApi';
+
+type FeaturedCriteria = 'featured' | 'rating' | 'sales';
 
 export default function FeaturedProducts() {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
+  const [criteria, setCriteria] = useState<FeaturedCriteria>('featured');
 
   useEffect(() => {
     const loadProducts = async () => {
       setLoading(true);
-      const allProducts = await getProducts();
-      // Mostrar solo los primeros 6 productos como destacados
-      setProducts(allProducts.slice(0, 6));
+      const featuredProducts = await getFeaturedProducts(criteria, 6);
+      setProducts(featuredProducts);
       setLoading(false);
     };
 
     loadProducts();
-  }, []);
+  }, [criteria]);
 
   const handleViewAll = () => {
     window.location.href = '/products';
+  };
+
+  const getCriteriaLabel = (crit: FeaturedCriteria): string => {
+    switch (crit) {
+      case 'featured':
+        return 'Destacados';
+      case 'rating':
+        return 'Mejor Calificación';
+      case 'sales':
+        return 'Más Vendidos';
+      default:
+        return 'Destacados';
+    }
   };
 
   return (
@@ -47,6 +63,40 @@ export default function FeaturedProducts() {
           <p className="text-lg text-gray-600 leading-relaxed">
             Selección cuidada de los mejores productos de belleza y cuidado personal, elegidos por Krisly Ramirez para garantizar calidad y resultados excepcionales.
           </p>
+        </div>
+
+        {/* Criteria Selector */}
+        <div className="mb-12 flex flex-wrap gap-3 animate-in fade-in slide-in-from-bottom duration-700">
+          <button
+            onClick={() => setCriteria('featured')}
+            className={`px-6 py-2 rounded-full font-semibold transition-all duration-300 ${
+              criteria === 'featured'
+                ? 'bg-pink-400 text-white shadow-lg'
+                : 'bg-white text-gray-700 border-2 border-pink-200 hover:border-pink-400'
+            }`}
+          >
+            {getCriteriaLabel('featured')}
+          </button>
+          <button
+            onClick={() => setCriteria('rating')}
+            className={`px-6 py-2 rounded-full font-semibold transition-all duration-300 ${
+              criteria === 'rating'
+                ? 'bg-pink-400 text-white shadow-lg'
+                : 'bg-white text-gray-700 border-2 border-pink-200 hover:border-pink-400'
+            }`}
+          >
+            {getCriteriaLabel('rating')}
+          </button>
+          <button
+            onClick={() => setCriteria('sales')}
+            className={`px-6 py-2 rounded-full font-semibold transition-all duration-300 ${
+              criteria === 'sales'
+                ? 'bg-pink-400 text-white shadow-lg'
+                : 'bg-white text-gray-700 border-2 border-pink-200 hover:border-pink-400'
+            }`}
+          >
+            {getCriteriaLabel('sales')}
+          </button>
         </div>
 
         {/* Loading State */}
@@ -74,7 +124,7 @@ export default function FeaturedProducts() {
         {/* Empty State */}
         {!loading && products.length === 0 && (
           <div className="text-center py-20">
-            <p className="text-gray-500 text-lg">No hay productos disponibles en este momento.</p>
+            <p className="text-gray-500 text-lg">No hay productos disponibles con este criterio.</p>
           </div>
         )}
 
