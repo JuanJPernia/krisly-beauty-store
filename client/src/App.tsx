@@ -11,6 +11,7 @@ import ProductDetail from "./pages/ProductDetail";
 import Checkout from "./pages/Checkout";
 import Success from "./pages/Success";
 import About from "./pages/About";
+import Contact from "./pages/Contact";
 
 
 function Router() {
@@ -20,6 +21,7 @@ function Router() {
       <Route path={"/products"} component={Products} />
       <Route path={"/product/:id"} component={ProductDetail} />
       <Route path={"/about"} component={About} />
+      <Route path={"/contact"} component={Contact} />
       <Route path={"/checkout"} component={Checkout} />
       <Route path={"/success"} component={Success} />
       <Route path={"/404"} component={NotFound} />

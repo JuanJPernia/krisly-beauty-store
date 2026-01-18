@@ -23,7 +23,7 @@ export default function Navbar() {
     { label: 'Inicio', href: '/' },
     { label: 'Productos', href: '/products' },
     { label: 'Sobre Krisly', href: '/about' },
-    { label: 'Contacto', href: '#contact' },
+    { label: 'Contacto', href: '/contact' },
   ];
 
   return (

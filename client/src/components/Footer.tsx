@@ -38,10 +38,16 @@ export default function Footer() {
           <div className="space-y-4">
             <h4 className="font-bold text-gray-900">Enlaces Rápidos</h4>
             <ul className="space-y-2">
-              {['Inicio', 'Productos', 'Sobre Krisly', 'Blog', 'Contacto'].map((link) => (
-                <li key={link}>
-                  <a href="#" className="text-gray-600 hover:text-pink-500 transition-colors duration-300 text-sm">
-                    {link}
+              {[
+                { label: 'Inicio', href: '/' },
+                { label: 'Productos', href: '/products' },
+                { label: 'Sobre Krisly', href: '/about' },
+                { label: 'Blog', href: '#' },
+                { label: 'Contacto', href: '/contact' },
+              ].map((link) => (
+                <li key={link.label}>
+                  <a href={link.href} className="text-gray-600 hover:text-pink-500 transition-colors duration-300 text-sm">
+                    {link.label}
                   </a>
                 </li>
               ))}
