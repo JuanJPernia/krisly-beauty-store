@@ -68,6 +68,10 @@ const featuredProducts = [
 ];
 
 export default function FeaturedProducts() {
+  const handleViewAll = () => {
+    window.location.href = '/products';
+  };
+
   return (
     <section className="py-20 bg-gradient-to-b from-white to-pink-50">
       <div className="container mx-auto px-4">
@@ -99,7 +103,10 @@ export default function FeaturedProducts() {
 
         {/* View All Button */}
         <div className="flex justify-center mt-16">
-          <button className="px-8 py-4 bg-pink-400 hover:bg-pink-500 text-white rounded-full font-semibold transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5">
+          <button
+            onClick={handleViewAll}
+            className="px-8 py-4 bg-pink-400 hover:bg-pink-500 text-white rounded-full font-semibold transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5"
+          >
             Ver Todos los Productos
           </button>
         </div>

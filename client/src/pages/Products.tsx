@@ -8,7 +8,7 @@
  * - Grid de productos con información detallada
  */
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Search, Filter } from 'lucide-react';
 import Navbar from '@/components/Navbar';
 import ProductCard from '@/components/ProductCard';
@@ -21,6 +21,15 @@ export default function Products() {
   const [sortBy, setSortBy] = useState('featured');
 
   const categories = ['Maquillaje', 'Cuidado Personal', 'Herramientas'];
+
+  // Leer parámetro de categoría de la URL al cargar
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const categoryParam = params.get('category');
+    if (categoryParam) {
+      setSelectedCategory(categoryParam);
+    }
+  }, []);
 
   // Filter products
   let filteredProducts = products;

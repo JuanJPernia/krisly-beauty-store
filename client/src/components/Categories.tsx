@@ -41,6 +41,10 @@ const categories: Category[] = [
 ];
 
 export default function Categories() {
+  const handleCategoryClick = (categoryName: string) => {
+    window.location.href = `/products?category=${encodeURIComponent(categoryName)}`;
+  };
+
   return (
     <section className="py-20 bg-white">
       <div className="container mx-auto px-4">
@@ -59,6 +63,7 @@ export default function Categories() {
           {categories.map((category, index) => (
             <div
               key={category.id}
+              onClick={() => handleCategoryClick(category.name)}
               className="group relative h-80 rounded-3xl overflow-hidden cursor-pointer animate-in fade-in slide-in-from-bottom duration-700"
               style={{ animationDelay: `${index * 100}ms` }}
             >
