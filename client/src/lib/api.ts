@@ -4,11 +4,10 @@
  */
 
 // URL base del backend
-// En desarrollo: usa localhost:8000 (si el backend está corriendo localmente)
-// En producción: usa ngrok o tu dominio
+// En desarrollo: Vite proxy redirige /api a localhost:8000
+// En producción: usar variable de entorno VITE_API_URL
 const isDevelopment = import.meta.env.DEV;
-const API_BASE_URL = import.meta.env.VITE_API_URL || 
-  (isDevelopment ? 'http://localhost:8000' : 'https://nondistorting-intradermal-andria.ngrok-free.dev');
+const API_BASE_URL = import.meta.env.VITE_API_URL || (isDevelopment ? '' : 'https://nondistorting-intradermal-andria.ngrok-free.dev');
 
 export const API_ENDPOINTS = {
   // Productos
