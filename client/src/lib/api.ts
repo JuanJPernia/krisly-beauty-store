@@ -4,10 +4,10 @@
  */
 
 // URL base del backend
+// Usar rutas relativas en todas partes
 // En desarrollo: Vite proxy redirige /api a localhost:8000
-// En producción: usar variable de entorno VITE_API_URL
-const isDevelopment = import.meta.env.DEV;
-const API_BASE_URL = import.meta.env.VITE_API_URL || (isDevelopment ? '' : 'https://nondistorting-intradermal-andria.ngrok-free.dev');
+// En producción: el servidor debe tener un proxy configurado
+const API_BASE_URL = '';
 
 export const API_ENDPOINTS = {
   // Productos
