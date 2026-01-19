@@ -37,10 +37,19 @@ queryClient.getMutationCache().subscribe(event => {
   }
 });
 
+// Determine the backend URL based on environment
+const getBackendUrl = () => {
+  if (typeof window === 'undefined') return '/api/trpc';
+  if (window.location.hostname === 'krisly-store.netlify.app') {
+    return 'https://krisly-beauty-store.onrender.com/api/trpc';
+  }
+  return '/api/trpc';
+};
+
 const trpcClient = trpc.createClient({
   links: [
     httpBatchLink({
-      url: "/api/trpc",
+      url: getBackendUrl(),
       transformer: superjson,
       fetch(input, init) {
         return globalThis.fetch(input, {
