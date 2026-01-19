@@ -11,6 +11,60 @@ from .routes import products, cart, reviews, contact
 # Crear las tablas en la base de datos
 Base.metadata.create_all(bind=engine)
 
+# Agregar productos de prueba si la BD está vacía
+def seed_initial_products():
+    from .database import SessionLocal
+    from .models import Product
+    
+    db = SessionLocal()
+    try:
+        # Verificar si hay productos
+        product_count = db.query(Product).count()
+        if product_count == 0:
+            # Agregar productos de prueba
+            products = [
+                Product(
+                    name="Sombra Negra Colorida",
+                    category="Maquillaje",
+                    price=29.99,
+                    image="https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=500&h=500&fit=crop",
+                    description="Sombra de ojos de alta pigmentación con acabado mate y shimmer",
+                    stock=50,
+                    rating=4.9,
+                    sales_count=125,
+                    is_featured=True
+                ),
+                Product(
+                    name="Labial Rojo Intenso",
+                    category="Maquillaje",
+                    price=24.99,
+                    image="https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=500&h=500&fit=crop",
+                    description="Labial de larga duración con acabado mate y cremoso",
+                    stock=75,
+                    rating=4.7,
+                    sales_count=89,
+                    is_featured=True
+                ),
+                Product(
+                    name="Crema Hidratante Premium",
+                    category="Cuidado Personal",
+                    price=45.99,
+                    image="https://images.unsplash.com/photo-1556228578-8c89e6adf883?w=500&h=500&fit=crop",
+                    description="Crema facial hidratante con ingredientes naturales y antienvejecimiento",
+                    stock=30,
+                    rating=4.8,
+                    sales_count=156,
+                    is_featured=True
+                )
+            ]
+            for product in products:
+                db.add(product)
+            db.commit()
+    finally:
+        db.close()
+
+seed_initial_products()
+
 # Crear la aplicación FastAPI
 app = FastAPI(
     title="Krisly Beauty API",
