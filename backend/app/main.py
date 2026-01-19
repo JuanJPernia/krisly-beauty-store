@@ -15,7 +15,8 @@ Base.metadata.create_all(bind=engine)
 app = FastAPI(
     title="Krisly Beauty API",
     description="API Backend para la tienda de belleza de Krisly Ramirez",
-    version="1.0.0"
+    version="1.0.0",
+    redirect_slashes=False  # Deshabilitar redirección automática de slashes
 )
 
 # Configurar CORS (para que el frontend pueda comunicarse con el backend)

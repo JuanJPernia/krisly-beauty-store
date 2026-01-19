@@ -12,6 +12,7 @@ from ..schemas import Product as ProductSchema, ProductCreate
 router = APIRouter(prefix="/api/products", tags=["products"])
 
 @router.get("/", response_model=list[ProductSchema])
+@router.get("", response_model=list[ProductSchema])  # Aceptar ambas versiones (con y sin slash)
 def get_products(
     category: str = None,
     skip: int = 0,
