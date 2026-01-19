@@ -4,9 +4,9 @@
  */
 
 // URL base del backend
-// En desarrollo: usa ngrok para exponer el backend local
+// En desarrollo: usa localhost:8000
 // En producción: tu dominio
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://nondistorting-intradermal-andria.ngrok-free.dev';
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
 
 export const API_ENDPOINTS = {
   // Productos
