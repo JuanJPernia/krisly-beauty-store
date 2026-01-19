@@ -4,10 +4,11 @@
  */
 
 // URL base del backend
-// Usar rutas relativas en todas partes
 // En desarrollo: Vite proxy redirige /api a localhost:8000
-// En producción: el servidor debe tener un proxy configurado
-const API_BASE_URL = '';
+// En producción: usa la URL de Render
+const API_BASE_URL = import.meta.env.MODE === 'production' 
+  ? 'https://krisly-beauty-store.onrender.com'
+  : '';
 
 export const API_ENDPOINTS = {
   // Productos
